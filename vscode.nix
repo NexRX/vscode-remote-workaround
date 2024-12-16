@@ -6,17 +6,7 @@
 }: let
   cfg = config.vscode-remote-workaround;
 in {
-  options.vscode-remote-workaround = {
-    enable = lib.mkEnableOption "automatic VSCode remote server patch";
-    package = lib.mkOption {
-      type = lib.types.package;
-      default = pkgs.nodejs_23;
-      defaultText = lib.literalExpression "pkgs.nodejs_23";
-      description = lib.mdDoc "The Node.js package to use. You generally shouldn't need to override this.";
-    };
-  };
-
-  config = lib.mkIf cfg.enable {
+  config = {
     systemd.user = {
       paths.vscode-remote-workaround = {
         wantedBy = ["default.target"];
@@ -26,7 +16,7 @@ in {
       services.vscode-remote-workaround.script = ''
         for i in ~/.vscode-server/bin/*; do
           echo "Fixing vscode-server in $i..."
-          ln -sf ${cfg.package}/bin/node $i/node
+          ln -sf ${pkgs.nodejs_23}/bin/node $i/node
         done
       '';
     };
